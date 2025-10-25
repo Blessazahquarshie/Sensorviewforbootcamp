@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import type { DateRange } from "react-day-picker";
 import { isWithinInterval } from "date-fns";
-import { AlertCircle, Download, Loader, Thermometer, Droplets, Leaf, Clock, Wifi, WifiOff, Bot, LogOut, LayoutGrid } from "lucide-react";
+import { AlertCircle, Download, Loader, Thermometer, Droplets, Leaf, Clock, Wifi, WifiOff, Bot, LogOut, BarChart3 } from "lucide-react";
 
 import type { SensorReading, ConnectionStatus } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -136,7 +136,7 @@ export default function DashboardPage() {
         <Card className="w-full max-w-md shadow-2xl">
           <CardHeader>
             <CardTitle className="flex items-center gap-3 text-2xl">
-              <LayoutGrid className="h-7 w-7 text-primary" />
+              <BarChart3 className="h-7 w-7 text-primary" />
               <span>SensorView</span>
             </CardTitle>
             <CardDescription>
@@ -184,7 +184,7 @@ export default function DashboardPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
-              <LayoutGrid className="h-7 w-7 text-primary" />
+              <BarChart3 className="h-7 w-7 text-primary" />
               <h1 className="text-2xl font-bold font-headline text-foreground">SensorView</h1>
             </div>
             <div className="flex items-center gap-4">
