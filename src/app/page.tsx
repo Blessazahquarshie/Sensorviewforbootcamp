@@ -3,11 +3,11 @@
 import { useState, useEffect, useMemo } from "react";
 import type { DateRange } from "react-day-picker";
 import { isWithinInterval } from "date-fns";
-import { AlertCircle, Download, Loader, Thermometer, Droplets, Leaf, Clock, Wifi, WifiOff, LayoutDashboard } from "lucide-react";
+import { AlertCircle, Download, Loader, Thermometer, Droplets, Leaf, Clock, Wifi, WifiOff, Bot, LogOut, LayoutGrid } from "lucide-react";
 
 import type { SensorReading, ConnectionStatus } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { DatePickerWithRange } from "@/components/dashboard/date-range-picker";
 import { SensorDataTable } from "@/components/dashboard/sensor-data-table";
@@ -26,6 +26,15 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
+  // Check for project ID in localStorage on initial load
+  useEffect(() => {
+    const savedProjectId = localStorage.getItem("firebaseProjectId");
+    if (savedProjectId) {
+      setProjectId(savedProjectId);
+      setInputProjectId(savedProjectId);
+    }
+  }, []);
+
   useEffect(() => {
     if (!projectId) {
       setConnectionStatus("disconnected");
@@ -35,8 +44,6 @@ export default function DashboardPage() {
     let intervalId: NodeJS.Timeout;
 
     const fetchData = async () => {
-      if (connectionStatus === 'error') return;
-
       setConnectionStatus("connecting");
       try {
         const response = await fetch(`https://${projectId}.firebaseio.com/sensors.json`);
@@ -77,8 +84,18 @@ export default function DashboardPage() {
       setSensorData([]);
       setDateRange(undefined);
       setError(null);
+      localStorage.setItem("firebaseProjectId", inputProjectId);
       setProjectId(inputProjectId);
     }
+  };
+
+  const handleDisconnect = () => {
+    localStorage.removeItem("firebaseProjectId");
+    setProjectId("");
+    setInputProjectId("");
+    setSensorData([]);
+    setConnectionStatus("disconnected");
+    setError(null);
   };
   
   const filteredData = useMemo(() => {
@@ -102,38 +119,79 @@ export default function DashboardPage() {
   const StatusIndicator = () => {
     switch (connectionStatus) {
       case "connected":
-        return <div className="flex items-center gap-2 text-green-700"><Wifi size={16} /> Connected</div>;
+        return <div className="flex items-center gap-2 text-primary"><Wifi size={16} /> Connected</div>;
       case "connecting":
-        return <div className="flex items-center gap-2 text-blue-700"><Loader size={16} className="animate-spin" /> Connecting...</div>;
+        return <div className="flex items-center gap-2 text-blue-500"><Loader size={16} className="animate-spin" /> Connecting...</div>;
       case "error":
         return <div className="flex items-center gap-2 text-destructive"><AlertCircle size={16} /> Error</div>;
       default:
         return <div className="flex items-center gap-2 text-muted-foreground"><WifiOff size={16} /> Disconnected</div>;
     }
   };
+  
+  // Login Widget View
+  if (!projectId || connectionStatus === 'error') {
+    return (
+      <div className="flex flex-col min-h-screen items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-md shadow-2xl">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-3 text-2xl">
+              <LayoutGrid className="h-7 w-7 text-primary" />
+              <span>SensorView</span>
+            </CardTitle>
+            <CardDescription>
+              Enter your Firebase Project ID to monitor your sensor data in real-time.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+             {connectionStatus === "error" && error && (
+                <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>Connection Error</AlertTitle>
+                    <AlertDescription>{error}</AlertDescription>
+                </Alert>
+            )}
+            <div className="space-y-2">
+              <Input
+                id="projectId"
+                type="text"
+                placeholder="Your Firebase Project ID"
+                value={inputProjectId}
+                onChange={(e) => setInputProjectId(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleConnect()}
+                className="text-base"
+              />
+            </div>
+          </CardContent>
+          <CardFooter className="flex-col items-stretch">
+            <Button onClick={handleConnect} disabled={connectionStatus === 'connecting' || !inputProjectId} className="w-full">
+              {connectionStatus === 'connecting' ? <><Loader className="mr-2 animate-spin" /> Connecting...</> : 'Connect'}
+            </Button>
+          </CardFooter>
+        </Card>
+        <p className="mt-8 text-sm text-muted-foreground flex items-center gap-2">
+          <Bot size={14} />
+          <span>Built with Firebase Studio</span>
+        </p>
+      </div>
+    );
+  }
 
+  // Main Dashboard View
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="sticky top-0 z-10 bg-gradient-to-r from-accent to-card text-foreground shadow-md">
+      <header className="sticky top-0 z-30 bg-card/80 backdrop-blur-sm shadow-sm">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
-              <LayoutDashboard className="h-7 w-7" />
-              <h1 className="text-2xl font-bold font-headline">SensorView</h1>
+              <LayoutGrid className="h-7 w-7 text-primary" />
+              <h1 className="text-2xl font-bold font-headline text-foreground">SensorView</h1>
             </div>
             <div className="flex items-center gap-4">
-              <div className="w-48">
-                <Input
-                  type="text"
-                  placeholder="Firebase Project ID"
-                  value={inputProjectId}
-                  onChange={(e) => setInputProjectId(e.target.value)}
-                  className="bg-background/20 placeholder:text-primary-foreground/70 border-primary-foreground/50 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring focus-visible:ring-offset-background"
-                />
-              </div>
-              <Button onClick={handleConnect} disabled={connectionStatus === 'connecting' || !inputProjectId} variant="secondary">
-                {connectionStatus === 'connecting' ? 'Connecting...' : 'Connect'}
-              </Button>
+                <div className="text-sm font-medium p-2 rounded-md bg-background"><StatusIndicator /></div>
+                <Button onClick={handleDisconnect} variant="outline" size="sm">
+                  <LogOut className="mr-2" /> Disconnect
+                </Button>
             </div>
           </div>
         </div>
@@ -148,20 +206,11 @@ export default function DashboardPage() {
                 Export to CSV
               </Button>
             </div>
-            <div className="text-sm font-medium p-2 rounded-md bg-card/70"><StatusIndicator /></div>
         </div>
         
-        {connectionStatus === "error" && error && (
-            <Alert variant="destructive" className="clip-octagon">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Connection Error</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-            </Alert>
-        )}
-
-        {projectId && (connectionStatus === 'connecting' || (connectionStatus === 'connected' && sensorData.length === 0)) && (
+        {connectionStatus === 'connecting' || (connectionStatus === 'connected' && sensorData.length === 0) ? (
           <div className="pt-16">
-            <Card className="clip-octagon w-full max-w-lg mx-auto">
+            <Card className="w-full max-w-lg mx-auto bg-card/70">
               <CardHeader>
                 <CardTitle className="text-center">
                   {connectionStatus === 'connecting' ? 'Fetching Sensor Data...' : 'Awaiting Data'}
@@ -171,7 +220,7 @@ export default function DashboardPage() {
                 {connectionStatus === 'connecting' ? (
                   <Loader size={48} className="animate-spin text-primary" />
                 ) : (
-                  <Wifi size={48} className="text-green-600" />
+                  <Wifi size={48} className="text-primary" />
                 )}
                 <p className="text-muted-foreground">
                   {connectionStatus === 'connecting' 
@@ -181,9 +230,7 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
           </div>
-        )}
-
-        {filteredData.length > 0 && (
+        ) : (
           <>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               <StatCard icon={<Thermometer />} title="Temperature" value={`${latestReading?.temperature.toFixed(1) ?? 'N/A'}°C`} />
@@ -193,7 +240,7 @@ export default function DashboardPage() {
             </div>
 
             <div className="grid gap-6 lg:grid-cols-2">
-              <Card className="clip-octagon">
+              <Card>
                 <CardHeader>
                   <CardTitle>Temperature & Humidity</CardTitle>
                   <CardDescription>Real-time sensor readings for temperature and humidity.</CardDescription>
@@ -202,7 +249,7 @@ export default function DashboardPage() {
                   <TempHumidityChart data={filteredData} />
                 </CardContent>
               </Card>
-              <Card className="clip-octagon">
+              <Card>
                 <CardHeader>
                   <CardTitle>Soil Moisture (%)</CardTitle>
                   <CardDescription>Real-time sensor readings for soil moisture percentage.</CardDescription>
@@ -213,7 +260,7 @@ export default function DashboardPage() {
               </Card>
             </div>
 
-            <Card className="clip-octagon">
+            <Card>
               <CardHeader>
                 <CardTitle>All Sensor Readings</CardTitle>
                 <CardDescription>A comprehensive log of all sensor data within the selected time frame.</CardDescription>
@@ -230,7 +277,7 @@ export default function DashboardPage() {
 }
 
 const StatCard = ({ icon, title, value }: { icon: React.ReactNode, title: string, value: string }) => (
-  <Card className="clip-octagon">
+  <Card>
     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
       <CardTitle className="text-sm font-medium">{title}</CardTitle>
       <div className="text-muted-foreground">{icon}</div>

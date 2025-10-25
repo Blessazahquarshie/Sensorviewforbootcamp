@@ -26,16 +26,16 @@ export function TempHumidityChart({ data }: TempHumidityChartProps) {
                 tickLine={false}
                 axisLine={false}
             />
-            <YAxis yAxisId="left" stroke="#8884d8" label={{ value: 'Temp (°C)', angle: -90, position: 'insideLeft', fill: '#8884d8', style: {textAnchor: 'middle'} }} fontSize={12} tickLine={false} axisLine={false} />
-            <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" label={{ value: 'Humidity (%)', angle: -90, position: 'insideRight', fill: '#82ca9d', style: {textAnchor: 'middle'} }} fontSize={12} tickLine={false} axisLine={false} />
+            <YAxis yAxisId="left" stroke="hsl(var(--chart-4))" label={{ value: 'Temp (°C)', angle: -90, position: 'insideLeft', fill: 'hsl(var(--chart-4))', style: {textAnchor: 'middle'} }} fontSize={12} tickLine={false} axisLine={false} />
+            <YAxis yAxisId="right" orientation="right" stroke="hsl(var(--chart-1))" label={{ value: 'Humidity (%)', angle: -90, position: 'insideRight', fill: 'hsl(var(--chart-1))', style: {textAnchor: 'middle'} }} fontSize={12} tickLine={false} axisLine={false} />
             <Tooltip
-                contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))' }}
+                contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 'var(--radius)' }}
                 labelFormatter={(label) => format(new Date(label), 'PPpp')}
                 formatter={(value, name) => [`${(value as number).toFixed(1)} ${name === 'temperature' ? '°C' : '%'}`, name.charAt(0).toUpperCase() + name.slice(1)]}
             />
             <Legend />
-            <Line yAxisId="left" type="monotone" dataKey="temperature" stroke="#8884d8" strokeWidth={2} dot={false} />
-            <Line yAxisId="right" type="monotone" dataKey="humidity" stroke="#82ca9d" strokeWidth={2} dot={false} />
+            <Line yAxisId="left" type="monotone" name="Temperature" dataKey="temperature" stroke="hsl(var(--chart-4))" strokeWidth={2} dot={false} />
+            <Line yAxisId="right" type="monotone" name="Humidity" dataKey="humidity" stroke="hsl(var(--chart-1))" strokeWidth={2} dot={false} />
         </LineChart>
         </ResponsiveContainer>
     </div>

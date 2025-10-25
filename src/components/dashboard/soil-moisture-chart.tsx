@@ -34,12 +34,12 @@ export function SoilMoistureChart({ data }: SoilMoistureChartProps) {
                     axisLine={false}
                 />
                 <Tooltip 
-                    contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))' }}
+                    contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 'var(--radius)' }}
                     labelFormatter={(label) => format(new Date(label), 'PPpp')}
                     formatter={(value) => [`${(value as number).toFixed(1)}%`, 'Soil Moisture']}
                 />
                 <Legend />
-                <Line type="monotone" dataKey="soil_moisture_percent" name="Soil Moisture" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="soil_moisture_percent" name="Soil Moisture" stroke="hsl(var(--chart-2))" strokeWidth={2} dot={false} />
             </LineChart>
         </ResponsiveContainer>
     </div>
