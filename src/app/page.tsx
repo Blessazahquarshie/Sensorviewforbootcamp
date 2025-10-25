@@ -202,7 +202,7 @@ export default function DashboardPage() {
                 <CardHeader>
                   <CardTitle>Soil Moisture (%)</CardTitle>
                   <CardDescription>Real-time sensor readings for soil moisture percentage.</CardDescription>
-                </Header>
+                </CardHeader>
                 <CardContent>
                   <SoilMoistureChart data={filteredData} />
                 </CardContent>
