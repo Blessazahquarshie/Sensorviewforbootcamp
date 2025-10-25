@@ -25,8 +25,6 @@ export default function DashboardPage() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
   useEffect(() => {
-    let intervalId: NodeJS.Timeout;
-
     const fetchData = async () => {
       setConnectionStatus("connecting");
       try {
@@ -53,12 +51,11 @@ export default function DashboardPage() {
       } catch (err) {
         setConnectionStatus("error");
         setError(err instanceof Error ? err.message : "An unknown error occurred.");
-        if(intervalId) clearInterval(intervalId);
       }
     };
     
     fetchData();
-    intervalId = setInterval(fetchData, POLLING_INTERVAL);
+    const intervalId = setInterval(fetchData, POLLING_INTERVAL);
 
     return () => clearInterval(intervalId);
   }, []);
