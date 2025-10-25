@@ -128,7 +128,7 @@ export default function DashboardPage() {
                   placeholder="Firebase Project ID"
                   value={inputProjectId}
                   onChange={(e) => setInputProjectId(e.target.value)}
-                  className="bg-background/20 placeholder:text-primary-foreground/70 border-primary-foreground/50 focus-visible:ring-offset-primary"
+                  className="bg-background/20 placeholder:text-primary-foreground/70 border-primary-foreground/50 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring focus-visible:ring-offset-background"
                 />
               </div>
               <Button onClick={handleConnect} disabled={connectionStatus === 'connecting' || !inputProjectId} variant="secondary">
