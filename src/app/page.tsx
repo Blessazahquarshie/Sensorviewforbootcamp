@@ -16,7 +16,7 @@ import { exportToCsv } from "@/lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const POLLING_INTERVAL = 5000; // 5 seconds
-const FIREBASE_URL = "https://sensorview-13b88-default-rtdb.europe-west1.firebasedatabase.app/sensors.json";
+const FIREBASE_URL = "https://sensorview-13b88-default-rtdb.europe-west1.firebasedatabase.app/sensor_logs.json";
 
 export default function DashboardPage() {
   const [sensorData, setSensorData] = useState<SensorReading[]>([]);
