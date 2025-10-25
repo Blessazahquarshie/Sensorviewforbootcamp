@@ -114,12 +114,12 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="sticky top-0 z-10 bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-md">
+      <header className="sticky top-0 z-10 bg-gradient-to-r from-primary to-card text-primary-foreground shadow-md">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
               <BarChart className="h-7 w-7" />
-              <h1 className="text-2xl font-bold font-headline">SensorView Dashboard</h1>
+              <h1 className="text-2xl font-bold font-headline text-foreground">SensorView Dashboard</h1>
             </div>
             <div className="flex items-center gap-4">
               <div className="w-48">
@@ -240,3 +240,5 @@ const StatCard = ({ icon, title, value }: { icon: React.ReactNode, title: string
     </CardContent>
   </Card>
 );
+
+    
