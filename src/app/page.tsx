@@ -77,9 +77,10 @@ export default function DashboardPage() {
     const endOfDay = dateRange.to ? new Date(dateRange.to) : new Date(dateRange.from);
     endOfDay.setHours(23, 59, 59, 999);
 
-    return sensorData.filter((reading) =>
-      isWithinInterval(new Date(reading.datetime), { start: dateRange.from!, end: endOfDay })
-    );
+    return sensorData.filter((reading) => {
+        const readingDate = new Date(reading.datetime);
+        return readingDate && isWithinInterval(readingDate, { start: dateRange.from!, end: endOfDay });
+    });
   }, [sensorData, dateRange]);
 
   const latestReading = useMemo(() => filteredData[filteredData.length - 1], [filteredData]);
