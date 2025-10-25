@@ -3,12 +3,11 @@
 import { useState, useEffect, useMemo } from "react";
 import type { DateRange } from "react-day-picker";
 import { isWithinInterval } from "date-fns";
-import { AlertCircle, Download, Loader, Thermometer, Droplets, Leaf, Clock, Wifi, WifiOff, Bot, LogOut, BarChart3 } from "lucide-react";
+import { AlertCircle, Download, Loader, Thermometer, Droplets, Leaf, Clock, Wifi, WifiOff, BarChart3 } from "lucide-react";
 
 import type { SensorReading, ConnectionStatus } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { DatePickerWithRange } from "@/components/dashboard/date-range-picker";
 import { SensorDataTable } from "@/components/dashboard/sensor-data-table";
 import { SoilMoistureChart } from "@/components/dashboard/soil-moisture-chart";
@@ -17,29 +16,23 @@ import { exportToCsv } from "@/lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const POLLING_INTERVAL = 5000; // 5 seconds
+const FIREBASE_URL = "https://sensorview-13b88-default-rtdb.europe-west1.firebasedatabase.app/sensors.json";
 
 export default function DashboardPage() {
-  const [projectId, setProjectId] = useState("your-project-id-here");
   const [sensorData, setSensorData] = useState<SensorReading[]>([]);
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>("disconnected");
   const [error, setError] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
   useEffect(() => {
-    if (!projectId || projectId === "your-project-id-here") {
-      setConnectionStatus("disconnected");
-      setError("Please set your Firebase Project ID in src/app/page.tsx");
-      return;
-    }
-
     let intervalId: NodeJS.Timeout;
 
     const fetchData = async () => {
       setConnectionStatus("connecting");
       try {
-        const response = await fetch(`https://${projectId}.firebaseio.com/sensors.json`);
+        const response = await fetch(FIREBASE_URL);
         if (!response.ok) {
-          throw new Error(`Failed to fetch data (Status: ${response.status}). Ensure project ID is correct and database rules allow public read access to '/sensors'.`);
+          throw new Error(`Failed to fetch data (Status: ${response.status}). Ensure the database URL is correct and rules allow public read access.`);
         }
         const data = await response.json();
         
@@ -68,7 +61,7 @@ export default function DashboardPage() {
     intervalId = setInterval(fetchData, POLLING_INTERVAL);
 
     return () => clearInterval(intervalId);
-  }, [projectId]);
+  }, []);
   
   const filteredData = useMemo(() => {
     if (!dateRange || !dateRange.from) {
@@ -101,7 +94,6 @@ export default function DashboardPage() {
     }
   };
   
-  // Main Dashboard View
   return (
     <div className="flex flex-col min-h-screen">
       <header className="sticky top-0 z-30 bg-card/80 backdrop-blur-sm shadow-sm">
@@ -153,8 +145,8 @@ export default function DashboardPage() {
                 )}
                 <p className="text-muted-foreground">
                   {connectionStatus === 'connecting' 
-                    ? `Attempting to connect to Firebase project '${projectId}'.`
-                    : `Successfully connected to '${projectId}', but no data was found at the '/sensors' path. Please ensure your device is sending data.`}
+                    ? `Attempting to connect to the sensor database.`
+                    : `Successfully connected, but no data was found. Please ensure your device is sending data.`}
                 </p>
               </CardContent>
             </Card>
