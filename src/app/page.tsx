@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import type { DateRange } from "react-day-picker";
 import { isWithinInterval } from "date-fns";
-import { AlertCircle, Download, Loader, Thermometer, Droplets, Leaf, Clock, Wifi, WifiOff } from "lucide-react";
+import { AlertCircle, Download, Loader, Thermometer, Droplets, Leaf, Clock, Wifi, WifiOff, BarChart } from "lucide-react";
 
 import type { SensorReading, ConnectionStatus } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -114,10 +114,13 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b">
+      <header className="sticky top-0 z-10 bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-md">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <h1 className="text-2xl font-bold font-headline">SensorView Dashboard</h1>
+            <div className="flex items-center gap-3">
+              <BarChart className="h-7 w-7" />
+              <h1 className="text-2xl font-bold font-headline">SensorView Dashboard</h1>
+            </div>
             <div className="flex items-center gap-4">
               <div className="w-48">
                 <Input
@@ -125,9 +128,10 @@ export default function DashboardPage() {
                   placeholder="Firebase Project ID"
                   value={inputProjectId}
                   onChange={(e) => setInputProjectId(e.target.value)}
+                  className="bg-background/20 placeholder:text-primary-foreground/70 border-primary-foreground/50 focus-visible:ring-offset-primary"
                 />
               </div>
-              <Button onClick={handleConnect} disabled={connectionStatus === 'connecting' || !inputProjectId}>
+              <Button onClick={handleConnect} disabled={connectionStatus === 'connecting' || !inputProjectId} variant="secondary">
                 {connectionStatus === 'connecting' ? 'Connecting...' : 'Connect'}
               </Button>
             </div>
