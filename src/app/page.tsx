@@ -20,43 +20,43 @@ const FIREBASE_URL = "https://sensorview-13b88-default-rtdb.europe-west1.firebas
 
 export default function DashboardPage() {
   const [sensorData, setSensorData] = useState<SensorReading[]>([]);
-  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>("disconnected");
+  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>("connecting");
   const [error, setError] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
   useEffect(() => {
     const fetchData = async () => {
-      setConnectionStatus("connecting");
+      setConnectionStatus((prevStatus) => (prevStatus === 'disconnected' ? 'connecting' : prevStatus));
       try {
         const response = await fetch(FIREBASE_URL);
         if (!response.ok) {
-          throw new Error(`Failed to fetch data (Status: ${response.status}). Ensure the database URL is correct and rules allow public read access.`);
+          throw new Error(`Failed to fetch data (Status: ${response.status}). Ensure the database URL is correct and public read access is allowed.`);
         }
         const data = await response.json();
         
-        if (data) {
-          const formattedData: SensorReading[] = Object.keys(data).map((key) => ({
-            id: key,
-            ...data[key],
-            datetime: data[key].datetime,
-          })).sort((a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime());
-          
-          setSensorData(formattedData);
-          setConnectionStatus("connected");
-          setError(null);
-        } else {
-            setSensorData([]);
-            setConnectionStatus("connected");
-        }
+        const formattedData: SensorReading[] = data 
+          ? Object.keys(data).map((key) => ({
+              id: key,
+              ...data[key],
+              datetime: data[key].datetime,
+            })).sort((a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime())
+          : [];
+        
+        setSensorData(formattedData);
+        setConnectionStatus("connected");
+        setError(null);
       } catch (err) {
         setConnectionStatus("error");
-        setError(err instanceof Error ? err.message : "An unknown error occurred.");
+        setError(err instanceof Error ? err.message : "An unknown error occurred while fetching data.");
+        // Stop polling on error to avoid repeated failed requests
+        clearInterval(intervalId);
       }
     };
     
-    fetchData();
+    fetchData(); // Initial fetch
     const intervalId = setInterval(fetchData, POLLING_INTERVAL);
 
+    // Cleanup interval on component unmount
     return () => clearInterval(intervalId);
   }, []);
   
