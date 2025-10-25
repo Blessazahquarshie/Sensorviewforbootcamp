@@ -92,13 +92,13 @@ export default function DashboardPage() {
   const StatusIndicator = () => {
     switch (connectionStatus) {
       case "connected":
-        return <div className="flex items-center gap-2 text-primary"><Wifi size={16} /> Connected</div>;
+        return <div className="flex items-center gap-2 text-green-600"><Wifi size={16} /> Connected</div>;
       case "connecting":
-        return <div className="flex items-center gap-2 text-blue-500"><Loader size={16} className="animate-spin" /> Connecting...</div>;
+        return <div className="flex items-center gap-2 text-green-400"><Loader size={16} className="animate-spin" /> Connecting...</div>;
       case "error":
-        return <div className="flex items-center gap-2 text-destructive"><AlertCircle size={16} /> Error</div>;
+        return <div className="flex items-center gap-2 text-red-600"><AlertCircle size={16} /> Error</div>;
       default:
-        return <div className="flex items-center gap-2 text-muted-foreground"><WifiOff size={16} /> Disconnected</div>;
+        return <div className="flex items-center gap-2 text-red-600"><WifiOff size={16} /> Disconnected</div>;
     }
   };
   
