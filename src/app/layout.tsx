@@ -3,8 +3,8 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
-  title: 'SensorView Dashboard',
-  description: 'Real-time sensor data visualization dashboard',
+  title: 'SensorView',
+  description: 'Real-time sensor data visualization',
 };
 
 export default function RootLayout({

@@ -119,7 +119,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
               <LayoutDashboard className="h-7 w-7" />
-              <h1 className="text-2xl font-bold font-headline text-foreground">SensorView Dashboard</h1>
+              <h1 className="text-2xl font-bold font-headline text-foreground">SensorView</h1>
             </div>
             <div className="flex items-center gap-4">
               <div className="w-48">
