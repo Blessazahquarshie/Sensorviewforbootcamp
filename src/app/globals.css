@@ -4,10 +4,10 @@
 
 @layer base {
   :root {
-    --background: 20 20% 97%; /* Light warm gray */
+    --background: 220 60% 97%; /* Very Light Blue */
     --foreground: 220 15% 25%; /* Dark blue-gray */
 
-    --card: 20 20% 99%;
+    --card: 220 50% 94%; /* Light Blue */
     --card-foreground: 220 15% 25%;
 
     --popover: 0 0% 100%;
@@ -28,8 +28,8 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 20 20% 90%;
-    --input: 20 20% 90%;
+    --border: 220 20% 90%;
+    --input: 220 20% 90%;
     --ring: 0 84.2% 60.2%;
     
     --radius: 0.5rem;
@@ -51,29 +51,29 @@
     --popover: 220 20% 12%;
     --popover-foreground: 20 10% 95%;
 
-    --primary: 0 75% 55%;
-    --primary-foreground: 0 0% 98%;
+    --primary: 0 75% 65%;
+    --primary-foreground: 0 0% 10%;
 
-    --secondary: 220 15% 25%;
+    --secondary: 220 20% 20%;
     --secondary-foreground: 20 10% 95%;
 
-    --muted: 220 15% 25%;
+    --muted: 220 20% 20%;
     --muted-foreground: 220 10% 65%;
-    
-    --accent: 220 70% 50%;
-    --accent-foreground: 0 0% 98%;
 
-    --destructive: 0 62.8% 30.6%;
+    --accent: 220 70% 60%;
+    --accent-foreground: 0 0% 10%;
+
+    --destructive: 0 70% 55%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 220 20% 25%;
-    --input: 220 20% 25%;
-    --ring: 0 75% 55%;
+    --border: 220 20% 30%;
+    --input: 220 20% 30%;
+    --ring: 0 75% 65%;
 
-    --chart-1: 0 70% 50%;
-    --chart-2: 210 70% 45%;
+    --chart-1: 0 70% 60%;
+    --chart-2: 210 65% 50%;
     --chart-3: 15 70% 55%;
-    --chart-4: 220 75% 60%;
+    --chart-4: 220 70% 60%;
     --chart-5: 30 70% 55%;
   }
 }
@@ -84,11 +84,5 @@
   }
   body {
     @apply bg-background text-foreground;
-  }
-}
-
-@layer utilities {
-  .clip-octagon {
-    clip-path: polygon(8% 0, 92% 0, 100% 8%, 100% 92%, 92% 100%, 8% 100%, 0 92%, 0 8%);
   }
 }
