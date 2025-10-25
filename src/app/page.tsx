@@ -19,25 +19,16 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 const POLLING_INTERVAL = 5000; // 5 seconds
 
 export default function DashboardPage() {
-  const [projectId, setProjectId] = useState("");
-  const [inputProjectId, setInputProjectId] = useState("");
+  const [projectId, setProjectId] = useState("your-project-id-here");
   const [sensorData, setSensorData] = useState<SensorReading[]>([]);
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>("disconnected");
   const [error, setError] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
-  // Check for project ID in localStorage on initial load
   useEffect(() => {
-    const savedProjectId = localStorage.getItem("firebaseProjectId");
-    if (savedProjectId) {
-      setProjectId(savedProjectId);
-      setInputProjectId(savedProjectId);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!projectId) {
+    if (!projectId || projectId === "your-project-id-here") {
       setConnectionStatus("disconnected");
+      setError("Please set your Firebase Project ID in src/app/page.tsx");
       return;
     }
 
@@ -78,25 +69,6 @@ export default function DashboardPage() {
 
     return () => clearInterval(intervalId);
   }, [projectId]);
-
-  const handleConnect = () => {
-    if (inputProjectId) {
-      setSensorData([]);
-      setDateRange(undefined);
-      setError(null);
-      localStorage.setItem("firebaseProjectId", inputProjectId);
-      setProjectId(inputProjectId);
-    }
-  };
-
-  const handleDisconnect = () => {
-    localStorage.removeItem("firebaseProjectId");
-    setProjectId("");
-    setInputProjectId("");
-    setSensorData([]);
-    setConnectionStatus("disconnected");
-    setError(null);
-  };
   
   const filteredData = useMemo(() => {
     if (!dateRange || !dateRange.from) {
@@ -129,54 +101,6 @@ export default function DashboardPage() {
     }
   };
   
-  // Login Widget View
-  if (!projectId || connectionStatus === 'error') {
-    return (
-      <div className="flex flex-col min-h-screen items-center justify-center bg-background p-4">
-        <Card className="w-full max-w-md shadow-2xl">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-3 text-2xl">
-              <BarChart3 className="h-7 w-7 text-primary" />
-              <span>SensorView</span>
-            </CardTitle>
-            <CardDescription>
-              Enter your Firebase Project ID to monitor your sensor data in real-time.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-             {connectionStatus === "error" && error && (
-                <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>Connection Error</AlertTitle>
-                    <AlertDescription>{error}</AlertDescription>
-                </Alert>
-            )}
-            <div className="space-y-2">
-              <Input
-                id="projectId"
-                type="text"
-                placeholder="Your Firebase Project ID"
-                value={inputProjectId}
-                onChange={(e) => setInputProjectId(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleConnect()}
-                className="text-base"
-              />
-            </div>
-          </CardContent>
-          <CardFooter className="flex-col items-stretch">
-            <Button onClick={handleConnect} disabled={connectionStatus === 'connecting' || !inputProjectId} className="w-full">
-              {connectionStatus === 'connecting' ? <><Loader className="mr-2 animate-spin" /> Connecting...</> : 'Connect'}
-            </Button>
-          </CardFooter>
-        </Card>
-        <p className="mt-8 text-sm text-muted-foreground flex items-center gap-2">
-          <Bot size={14} />
-          <span>Built with Firebase Studio</span>
-        </p>
-      </div>
-    );
-  }
-
   // Main Dashboard View
   return (
     <div className="flex flex-col min-h-screen">
@@ -189,9 +113,6 @@ export default function DashboardPage() {
             </div>
             <div className="flex items-center gap-4">
                 <div className="text-sm font-medium p-2 rounded-md bg-background"><StatusIndicator /></div>
-                <Button onClick={handleDisconnect} variant="outline" size="sm">
-                  <LogOut className="mr-2" /> Disconnect
-                </Button>
             </div>
           </div>
         </div>
@@ -208,7 +129,15 @@ export default function DashboardPage() {
             </div>
         </div>
         
-        {connectionStatus === 'connecting' || (connectionStatus === 'connected' && sensorData.length === 0) ? (
+        {connectionStatus === "error" && error && (
+            <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Connection Error</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+            </Alert>
+        )}
+
+        {connectionStatus === 'connecting' || (connectionStatus === 'connected' && sensorData.length === 0 && !error) ? (
           <div className="pt-16">
             <Card className="w-full max-w-lg mx-auto bg-card/70">
               <CardHeader>
@@ -231,45 +160,47 @@ export default function DashboardPage() {
             </Card>
           </div>
         ) : (
-          <>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-              <StatCard icon={<Thermometer />} title="Temperature" value={`${latestReading?.temperature.toFixed(1) ?? 'N/A'}°C`} />
-              <StatCard icon={<Droplets />} title="Humidity" value={`${latestReading?.humidity.toFixed(1) ?? 'N/A'}%`} />
-              <StatCard icon={<Leaf />} title="Soil Moisture" value={`${latestReading?.soil_moisture_percent.toFixed(1) ?? 'N/A'}%`} />
-              <StatCard icon={<Clock />} title="Last Update" value={latestReading ? new Date(latestReading.datetime).toLocaleTimeString() : 'N/A'} />
-            </div>
+          !error && (
+            <>
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                <StatCard icon={<Thermometer />} title="Temperature" value={`${latestReading?.temperature.toFixed(1) ?? 'N/A'}°C`} />
+                <StatCard icon={<Droplets />} title="Humidity" value={`${latestReading?.humidity.toFixed(1) ?? 'N/A'}%`} />
+                <StatCard icon={<Leaf />} title="Soil Moisture" value={`${latestReading?.soil_moisture_percent.toFixed(1) ?? 'N/A'}%`} />
+                <StatCard icon={<Clock />} title="Last Update" value={latestReading ? new Date(latestReading.datetime).toLocaleTimeString() : 'N/A'} />
+              </div>
 
-            <div className="grid gap-6 lg:grid-cols-2">
+              <div className="grid gap-6 lg:grid-cols-2">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Temperature & Humidity</CardTitle>
+                    <CardDescription>Real-time sensor readings for temperature and humidity.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <TempHumidityChart data={filteredData} />
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Soil Moisture (%)</CardTitle>
+                    <CardDescription>Real-time sensor readings for soil moisture percentage.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <SoilMoistureChart data={filteredData} />
+                  </CardContent>
+                </Card>
+              </div>
+
               <Card>
                 <CardHeader>
-                  <CardTitle>Temperature & Humidity</CardTitle>
-                  <CardDescription>Real-time sensor readings for temperature and humidity.</CardDescription>
+                  <CardTitle>All Sensor Readings</CardTitle>
+                  <CardDescription>A comprehensive log of all sensor data within the selected time frame.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <TempHumidityChart data={filteredData} />
+                  <SensorDataTable data={filteredData} />
                 </CardContent>
               </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Soil Moisture (%)</CardTitle>
-                  <CardDescription>Real-time sensor readings for soil moisture percentage.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <SoilMoistureChart data={filteredData} />
-                </CardContent>
-              </Card>
-            </div>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>All Sensor Readings</CardTitle>
-                <CardDescription>A comprehensive log of all sensor data within the selected time frame.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <SensorDataTable data={filteredData} />
-              </CardContent>
-            </Card>
-          </>
+            </>
+          )
         )}
       </main>
     </div>
