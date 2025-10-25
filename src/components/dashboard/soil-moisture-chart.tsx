@@ -1,7 +1,7 @@
 "use client"
 
 import { Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts"
-import { format } from 'date-fns'
+import { format, isValid } from 'date-fns'
 import type { SensorReading } from "@/lib/types"
 
 interface SoilMoistureChartProps {
@@ -20,7 +20,10 @@ export function SoilMoistureChart({ data }: SoilMoistureChartProps) {
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis 
                     dataKey="datetime" 
-                    tickFormatter={(time) => format(new Date(time), 'HH:mm')}
+                    tickFormatter={(time) => {
+                        const date = new Date(time);
+                        return isValid(date) ? format(date, 'HH:mm') : '';
+                    }}
                     stroke="hsl(var(--muted-foreground))"
                     fontSize={12}
                     tickLine={false}
@@ -35,7 +38,10 @@ export function SoilMoistureChart({ data }: SoilMoistureChartProps) {
                 />
                 <Tooltip 
                     contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 'var(--radius)' }}
-                    labelFormatter={(label) => format(new Date(label), 'PPpp')}
+                    labelFormatter={(label) => {
+                        const date = new Date(label);
+                        return isValid(date) ? format(date, 'PPpp') : '';
+                    }}
                     formatter={(value) => [`${(value as number).toFixed(1)}%`, 'Soil Moisture']}
                 />
                 <Legend />

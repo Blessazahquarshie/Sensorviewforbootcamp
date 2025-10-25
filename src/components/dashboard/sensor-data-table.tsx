@@ -10,7 +10,7 @@ import {
   } from "@/components/ui/table"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import type { SensorReading } from "@/lib/types"
-import { format } from 'date-fns'
+import { format, isValid } from 'date-fns'
   
 interface SensorDataTableProps {
     data: SensorReading[];
@@ -31,15 +31,18 @@ export function SensorDataTable({ data }: SensorDataTableProps) {
           </TableHeader>
           <TableBody>
             {data.length > 0 ? (
-              data.slice().reverse().map((reading) => (
-                <TableRow key={reading.id}>
-                  <TableCell>{format(new Date(reading.datetime), 'PPpp')}</TableCell>
-                  <TableCell className="text-right">{reading.temperature.toFixed(2)}</TableCell>
-                  <TableCell className="text-right">{reading.humidity.toFixed(2)}</TableCell>
-                  <TableCell className="text-right">{reading.soil_moisture_percent.toFixed(2)}</TableCell>
-                  <TableCell className="text-right">{reading.soil_moisture_raw}</TableCell>
-                </TableRow>
-              ))
+              data.slice().reverse().map((reading) => {
+                const date = new Date(reading.datetime);
+                return (
+                    <TableRow key={reading.id}>
+                    <TableCell>{isValid(date) ? format(date, 'PPpp') : 'Invalid Date'}</TableCell>
+                    <TableCell className="text-right">{reading.temperature.toFixed(2)}</TableCell>
+                    <TableCell className="text-right">{reading.humidity.toFixed(2)}</TableCell>
+                    <TableCell className="text-right">{reading.soil_moisture_percent.toFixed(2)}</TableCell>
+                    <TableCell className="text-right">{reading.soil_moisture_raw}</TableCell>
+                    </TableRow>
+                )
+              })
             ) : (
               <TableRow>
                 <TableCell colSpan={5} className="h-24 text-center">

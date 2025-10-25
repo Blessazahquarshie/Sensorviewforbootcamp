@@ -1,7 +1,7 @@
 "use client"
 
 import { Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts"
-import { format } from 'date-fns'
+import { format, isValid } from 'date-fns'
 import type { SensorReading } from "@/lib/types"
 
 interface TempHumidityChartProps {
@@ -20,7 +20,10 @@ export function TempHumidityChart({ data }: TempHumidityChartProps) {
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
             <XAxis 
                 dataKey="datetime" 
-                tickFormatter={(time) => format(new Date(time), 'HH:mm')}
+                tickFormatter={(time) => {
+                    const date = new Date(time);
+                    return isValid(date) ? format(date, 'HH:mm') : '';
+                }}
                 stroke="hsl(var(--muted-foreground))"
                 fontSize={12}
                 tickLine={false}
@@ -30,7 +33,10 @@ export function TempHumidityChart({ data }: TempHumidityChartProps) {
             <YAxis yAxisId="right" orientation="right" stroke="hsl(var(--chart-1))" label={{ value: 'Humidity (%)', angle: -90, position: 'insideRight', fill: 'hsl(var(--chart-1))', style: {textAnchor: 'middle'} }} fontSize={12} tickLine={false} axisLine={false} />
             <Tooltip
                 contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 'var(--radius)' }}
-                labelFormatter={(label) => format(new Date(label), 'PPpp')}
+                labelFormatter={(label) => {
+                    const date = new Date(label);
+                    return isValid(date) ? format(date, 'PPpp') : '';
+                }}
                 formatter={(value, name) => [`${(value as number).toFixed(1)} ${name === 'temperature' ? '°C' : '%'}`, name.charAt(0).toUpperCase() + name.slice(1)]}
             />
             <Legend />
