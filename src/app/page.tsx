@@ -104,12 +104,12 @@ export default function DashboardPage() {
   
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="sticky top-0 z-30 bg-card/80 backdrop-blur-sm shadow-sm">
+      <header className="sticky top-0 z-30 bg-accent/80 backdrop-blur-sm shadow-sm">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
-              <LayoutDashboard className="h-7 w-7 text-primary" />
-              <h1 className="text-2xl font-bold font-headline text-foreground">SensorView</h1>
+              <LayoutDashboard className="h-7 w-7 text-accent-foreground" />
+              <h1 className="text-2xl font-bold font-headline text-accent-foreground">SensorView</h1>
             </div>
             <div className="flex items-center gap-4">
                 <div className="text-sm font-medium p-2 rounded-md bg-background"><StatusIndicator /></div>
