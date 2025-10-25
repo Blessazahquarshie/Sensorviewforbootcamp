@@ -25,7 +25,11 @@ export default function DashboardPage() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
   useEffect(() => {
+    let isMounted = true;
+    let intervalId: NodeJS.Timeout;
+
     const fetchData = async () => {
+      if (!isMounted) return;
       setConnectionStatus((prevStatus) => (prevStatus === 'disconnected' ? 'connecting' : prevStatus));
       try {
         const response = await fetch(FIREBASE_URL);
@@ -34,6 +38,8 @@ export default function DashboardPage() {
         }
         const data = await response.json();
         
+        if (!isMounted) return;
+
         const formattedData: SensorReading[] = data 
           ? Object.keys(data).map((key) => ({
               id: key,
@@ -46,6 +52,7 @@ export default function DashboardPage() {
         setConnectionStatus("connected");
         setError(null);
       } catch (err) {
+        if (!isMounted) return;
         setConnectionStatus("error");
         setError(err instanceof Error ? err.message : "An unknown error occurred while fetching data.");
         // Stop polling on error to avoid repeated failed requests
@@ -54,10 +61,13 @@ export default function DashboardPage() {
     };
     
     fetchData(); // Initial fetch
-    const intervalId = setInterval(fetchData, POLLING_INTERVAL);
+    intervalId = setInterval(fetchData, POLLING_INTERVAL);
 
     // Cleanup interval on component unmount
-    return () => clearInterval(intervalId);
+    return () => {
+      isMounted = false;
+      clearInterval(intervalId);
+    };
   }, []);
   
   const filteredData = useMemo(() => {
